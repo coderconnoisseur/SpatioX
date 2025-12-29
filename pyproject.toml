@@ -3,17 +3,17 @@ requires = ["setuptools>=61.0", "wheel", "pybind11>=2.6.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "SpatioX"
+name = "spatiox"
 version = "0.1.0a1"
 description = "High-performance spatial-temporal indexing engine with Python bindings for geospatial and time-series data"
 readme = "README.md"
-requires-python = ">=3.7"
-license = {text = "MIT"}
+requires-python = ">=3.8"
+license = "MIT"
 authors = [
-    {name = "Spatio Contributors", email = ""},
+    {name = "Nishant B", email = "nishantborkar28@gmail.com"},
 ]
 maintainers = [
-    {name = "Spatio Contributors", email = ""},
+    {name = "Nishant B", email = "nishantborkar28@gmail.com"},
 ]
 keywords = [
     "spatial",
@@ -41,11 +41,10 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     
     # License
-    "License :: OSI Approved :: MIT License",
+
     
     # Python Versions
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -64,7 +63,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "pybind11>=2.6.0",
+    
 ]
 
 [project.optional-dependencies]
@@ -88,11 +87,11 @@ Issues = "https://github.com/coderconnoisseur/SpatioX/issues"
 Changelog = "https://github.com/coderconnoisseur/SpatioX/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
-packages = ["spatio"]
-package-dir = {"spatio" = "python/spatio"}
+packages = ["spatiox"]
+package-dir = {"spatiox" = "python/spatiox"}
 
 [tool.setuptools.package-data]
-spatio = ["py.typed", "*.pyi"]
+spatiox = ["py.typed", "*.pyi"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
