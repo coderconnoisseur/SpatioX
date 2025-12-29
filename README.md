@@ -1,0 +1,207 @@
+# Spatio-Temporal Index Engine
+
+A high-performance C++ library with Python bindings for efficiently indexing and querying events with both spatial (latitude/longitude) and temporal (time) coordinates.
+
+## Features
+
+- **Fast Spatial Queries**: KD-tree implementation for efficient 2D spatial indexing
+- **Efficient Time Filtering**: Multimap-based temporal index for quick time range queries
+- **Hybrid Queries**: Combine spatial and temporal constraints (e.g., "find all taxi rides in Manhattan between 3-5 PM")
+- **C++ Performance**: Heavy computation in optimized C++ core
+- **Python Friendly**: Simple Python API with flexible payload storage
+
+## Use Cases
+
+- **Transportation Analytics**: Query taxi rides, deliveries, or vehicle movements by location and time
+- **Photo Management**: Find photos taken within a radius of a location during a specific time period
+- **Event Analysis**: Track and query spatial-temporal events (check-ins, sensor readings, etc.)
+- **IoT Data**: Index and retrieve sensor data based on location and timestamp
+
+## Installation
+
+### Prerequisites
+
+- Python 3.7+
+- CMake 3.15+
+- C++17 compatible compiler
+- pybind11
+
+### Build from Source
+
+```bash
+# Clone or navigate to the project directory
+cd spatio-temporal-index
+
+# Install in development mode
+pip install -e .
+```
+
+This will build the C++ extension and install the Python package.
+
+## Quick Start
+
+```python
+from spatio import SpatioIndex
+
+# Create index
+index = SpatioIndex()
+
+# Insert records with payloads
+id1 = index.insert(40.7128, -74.0060, 1000.0, 
+                   payload={"type": "taxi", "fare": 15.50, "passenger": "Alice"})
+id2 = index.insert(40.7589, -73.9851, 1500.0, 
+                   payload={"type": "taxi", "fare": 22.00, "passenger": "Bob"})
+id3 = index.insert(40.7614, -73.9776, 2000.0, 
+                   payload={"type": "taxi", "fare": 18.75, "passenger": "Charlie"})
+
+# Query by radius and time range
+results = index.query_radius_time(
+    center_lat=40.7589,
+    center_lon=-73.9851,
+    radius_km=2.0,
+    t_start=1000.0,
+    t_end=1600.0
+)
+
+print(f"Found {len(results)} records")
+for record_id in results:
+    payload = index.get_payload(record_id)
+    record = index.get_record(record_id)
+    print(f"ID {record_id}: {payload} at ({record.lat}, {record.lon}) @ t={record.t}")
+
+# Query by bounding box and time
+results = index.query_box_time(
+    lat_min=40.70, lon_min=-74.01,
+    lat_max=40.80, lon_max=-73.90,
+    t_start=500.0,
+    t_end=2500.0
+)
+```
+
+## Architecture
+
+### Three-Layer Design
+
+1. **Python Layer**: User-facing API
+   - Simple interface for insert/query operations
+   - Payload storage (arbitrary Python objects)
+   - Type hints and documentation
+
+2. **C++ Core**: High-performance computation
+   - KD-tree for spatial indexing
+   - Multimap for temporal indexing
+   - Haversine distance calculations
+   - Query optimization
+
+3. **Storage**: In-memory (MVP)
+   - Vector-based record storage
+   - Fast lookups via hash maps
+   - Future: disk persistence support
+
+### Core Components
+
+- **Record**: Spatial-temporal point (lat, lon, timestamp, ID)
+- **RecordStore**: Manages all records and assigns unique IDs
+- **SpatialIndex**: KD-tree for 2D spatial queries
+- **TemporalIndex**: Time-based queries using sorted multimap
+- **SpatioIndexCore**: Combines spatial + temporal with spatial-first strategy
+
+### Query Strategy
+
+The engine uses a **spatial-first** approach:
+1. Query the spatial index (KD-tree) first
+2. Filter results by time constraints
+3. Return matching IDs
+
+This is efficient when spatial queries are more selective than temporal queries.
+
+## API Reference
+
+### SpatioIndex
+
+#### `insert(lat, lon, t, payload=None) -> int`
+Insert a spatial-temporal record.
+
+**Parameters:**
+- `lat` (float): Latitude in degrees [-90, 90]
+- `lon` (float): Longitude in degrees [-180, 180]
+- `t` (float): Timestamp
+- `payload` (Any, optional): User data to associate with record
+
+**Returns:** Unique record ID
+
+#### `query_radius_time(center_lat, center_lon, radius_km, t_start, t_end) -> List[int]`
+Find records within a circular area and time range.
+
+**Parameters:**
+- `center_lat` (float): Center latitude
+- `center_lon` (float): Center longitude
+- `radius_km` (float): Radius in kilometers
+- `t_start` (float): Start time (inclusive)
+- `t_end` (float): End time (inclusive)
+
+**Returns:** List of record IDs
+
+#### `query_box_time(lat_min, lon_min, lat_max, lon_max, t_start, t_end) -> List[int]`
+Find records within a bounding box and time range.
+
+#### `get_record(record_id) -> Optional[Record]`
+Get the Record object by ID.
+
+#### `get_payload(record_id) -> Optional[Any]`
+Get the payload associated with a record.
+
+#### `size() -> int`
+Get total number of records.
+
+#### `clear()`
+Clear all records and payloads.
+
+## Project Structure
+
+```
+spatio-temporal-index/
+├── CMakeLists.txt           # CMake build configuration
+├── setup.py                 # Python package setup
+├── README.md                # This file
+├── include/                 # C++ header files
+│   ├── record.hpp
+│   ├── record_store.hpp
+│   ├── spatial_index.hpp
+│   ├── temporal_index.hpp
+│   ├── spatio_index_core.hpp
+│   └── utils.hpp
+├── src/                     # C++ implementation
+│   ├── record_store.cpp
+│   ├── spatial_index.cpp
+│   ├── temporal_index.cpp
+│   ├── spatio_index_core.cpp
+│   └── bindings.cpp         # pybind11 Python bindings
+└── python/                  # Python package
+    └── spatio/
+        └── __init__.py
+```
+
+## Performance Notes
+
+- **Spatial queries**: O(log n) average case for KD-tree
+- **Temporal queries**: O(log n + k) where k is result size
+- **Combined queries**: Dominated by spatial query + linear scan for time filtering
+- **Distance calculation**: Haversine formula for accurate geographic distances
+
+## Future Enhancements
+
+- [ ] Disk persistence (SQLite, custom format)
+- [ ] Bulk insert optimization
+- [ ] Parallel query execution
+- [ ] Additional query types (k-NN, polygon regions)
+- [ ] Index compression
+- [ ] Time-first query strategy (auto-select best approach)
+
+## License
+
+MIT License (or your chosen license)
+
+## Contributing
+
+Contributions welcome! Please feel free to submit pull requests or open issues.

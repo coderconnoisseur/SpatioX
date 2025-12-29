@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+setup.py
+python/spatio/__init__.py
+spatio.egg-info/PKG-INFO
+spatio.egg-info/SOURCES.txt
+spatio.egg-info/dependency_links.txt
+spatio.egg-info/requires.txt
+spatio.egg-info/top_level.txt
+src/bindings.cpp
+src/record_store.cpp
+src/spatial_index.cpp
+src/spatio_index_core.cpp
+src/temporal_index.cpp
