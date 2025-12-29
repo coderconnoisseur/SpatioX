@@ -48,22 +48,37 @@ void SpatialIndex::radius_query_recursive(const KDNode* node, float center_lat,
         results.push_back(node->id);
     }
     
-    // Determine which subtrees to explore
+    // Determine which subtrees to explore using correct Haversine distance
     int axis = node->axis;
     float center_value = (axis == 0) ? center_lat : center_lon;
     float node_value = node->point[axis];
     
-    // Approximate bounding check (simplified for KD-tree pruning)
-    // Convert radius to degrees (rough approximation: 1 degree ≈ 111 km ≈ 111000 m)
-    double radius_deg = radius_m / 111000.0;
+    // Calculate actual distance from query center to the splitting plane
+    // This is mathematically correct (no approximation) and handles all edge cases
+    double plane_dist_m;
+    if (axis == 0) {  // Latitude axis
+        plane_dist_m = haversine_distance(center_lat, center_lon, node_value, center_lon);
+    } else {  // Longitude axis
+        plane_dist_m = haversine_distance(center_lat, center_lon, center_lat, node_value);
+    }
     
-    bool should_explore_left = (center_value - radius_deg <= node_value);
-    bool should_explore_right = (center_value + radius_deg >= node_value);
+    // If plane is outside radius, only explore the side containing the query point
+    // If plane intersects radius, must explore both sides
+    bool explore_left = true;
+    bool explore_right = true;
     
-    if (should_explore_left) {
+    if (plane_dist_m > radius_m) {
+        if (center_value < node_value) {
+            explore_right = false;  // Query is on left side, right can't have results
+        } else {
+            explore_left = false;   // Query is on right side, left can't have results
+        }
+    }
+    
+    if (explore_left) {
         radius_query_recursive(node->left.get(), center_lat, center_lon, radius_m, results);
     }
-    if (should_explore_right) {
+    if (explore_right) {
         radius_query_recursive(node->right.get(), center_lat, center_lon, radius_m, results);
     }
 }

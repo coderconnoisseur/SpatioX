@@ -1,14 +1,115 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "pybind11>=2.6.0"]
+requires = ["setuptools>=61.0", "wheel", "pybind11>=2.6.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "spatio"
-version = "0.1.0"
-description = "Spatial-Temporal Index Engine"
+name = "SpatioX"
+version = "0.1.0a1"
+description = "High-performance spatial-temporal indexing engine with Python bindings for geospatial and time-series data"
 readme = "README.md"
 requires-python = ">=3.7"
-dependencies = ["pybind11>=2.6.0"]
+license = {text = "MIT"}
+authors = [
+    {name = "Spatio Contributors", email = ""},
+]
+maintainers = [
+    {name = "Spatio Contributors", email = ""},
+]
+keywords = [
+    "spatial",
+    "temporal",
+    "geospatial",
+    "indexing",
+    "kdtree",
+    "haversine",
+    "location",
+    "gis",
+    "time-series",
+    "spatio-temporal",
+]
+classifiers = [
+    # Development Status
+    "Development Status :: 3 - Alpha",
+    
+    # Intended Audience
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    
+    # Topic
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Database :: Database Engines/Servers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    
+    # License
+    "License :: OSI Approved :: MIT License",
+    
+    # Python Versions
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    
+    # Implementation
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: C++",
+    
+    # Operating Systems
+    "Operating System :: OS Independent",
+    
+    # Typing
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "pybind11>=2.6.0",
+]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "black",
+    "mypy",
+    "ruff",
+]
+benchmark = [
+    "numpy",
+    "matplotlib",
+]
+
+[project.urls]
+Homepage = "https://github.com/coderconnoisseur/SpatioX"
+Documentation = "https://github.com/coderconnoisseur/SpatioX#readme"
+Repository = "https://github.com/coderconnoisseur/SpatioX.git"
+Issues = "https://github.com/coderconnoisseur/SpatioX/issues"
+Changelog = "https://github.com/coderconnoisseur/SpatioX/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+packages = ["spatio"]
+package-dir = {"spatio" = "python/spatio"}
+
+[tool.setuptools.package-data]
+spatio = ["py.typed", "*.pyi"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+[tool.black]
+line-length = 100
+target-version = ["py37", "py38", "py39", "py310", "py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py37"
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
