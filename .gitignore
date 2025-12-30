@@ -201,3 +201,6 @@ benchmarks/results/
 # Don't ignore these
 !.gitkeep
 !.github/
+example.py
+test_basic.py
+documentation.txt
