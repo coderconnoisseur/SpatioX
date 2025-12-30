@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <cstdint>
+#include <limits>
 
 namespace spatio {
 
@@ -33,6 +34,27 @@ public:
     std::vector<uint64_t> range_query(double t_start, double t_end) const;
 
     /**
+     * @brief Get all record IDs in the index
+     * 
+     * @return Vector of all record IDs
+     */
+    std::vector<uint64_t> all_records() const;
+    
+    /**
+     * @brief Get the minimum timestamp in the index
+     * 
+     * @return The minimum timestamp
+     */
+    double min_time() const { return min_time_; }
+
+    /**
+     * @brief Get the maximum timestamp in the index
+     * 
+     * @return The maximum timestamp
+     */
+    double max_time() const { return max_time_; }
+    
+    /**
      * @brief Clear the temporal index
      */
     void clear();
@@ -44,6 +66,8 @@ public:
 
 private:
     std::multimap<double, uint64_t> time_index_;
+    double min_time_ = std::numeric_limits<double>::max();
+    double max_time_ = std::numeric_limits<double>::lowest();
 };
 
 } // namespace spatio

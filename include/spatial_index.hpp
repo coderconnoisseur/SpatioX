@@ -110,7 +110,9 @@ private:
     struct KNNCandidate {
         uint64_t id;
         double distance;
-        bool operator>(const KNNCandidate& other) const {
+        
+        // For std::push_heap - we want a max-heap (largest distance on top)
+        bool operator<(const KNNCandidate& other) const {
             return distance > other.distance;
         }
     };
