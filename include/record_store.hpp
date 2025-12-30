@@ -19,7 +19,9 @@ public:
     // Get record by ID (returns nullopt if not found)
     std::optional<Record> get_record(uint64_t id) const;
     
-    // Get direct pointer (for zero-copy access)
+    // Zero-copy access - returns pointer directly into storage
+    // WARNING: Pointer is invalidated by any insert/clear operation
+    // Only safe to use immediately after retrieval
     const Record* get_record_ptr(uint64_t id) const;
     
     // Get number of records
