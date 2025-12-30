@@ -139,14 +139,8 @@ std::vector<uint64_t> SpatioIndexCore::query_radius_time_instrumented(
 // ==================== DATA ACCESS ====================
 
 const Record* SpatioIndexCore::get_record_ptr(uint64_t id) const {
-    auto opt = record_store_.get_record(id);
-    if (!opt) return nullptr;
-    
-    // This is a workaround - ideally RecordStore should return const Record*
-    // For now, we use thread_local storage
-    thread_local Record cached_record;
-    cached_record = *opt;
-    return &cached_record;
+    // TRUE zero-copy: direct pointer into RecordStore's vector
+    return record_store_.get_record_ptr(id);
 }
 
 // ==================== FILTERING HELPERS ====================
@@ -157,7 +151,8 @@ std::vector<uint64_t> SpatioIndexCore::filter_by_time(const std::vector<uint64_t
     results.reserve(spatial_ids.size());
     
     for (uint64_t id : spatial_ids) {
-        auto record = record_store_.get_record(id);
+        // Use zero-copy pointer access
+        const Record* record = record_store_.get_record_ptr(id);
         if (record && record->t >= t_start && record->t <= t_end) {
             results.push_back(id);
         }
@@ -175,7 +170,7 @@ std::vector<uint64_t> SpatioIndexCore::filter_by_time_instrumented(
     results.reserve(spatial_ids.size());
     
     for (uint64_t id : spatial_ids) {
-        auto record = record_store_.get_record(id);
+        const Record* record = record_store_.get_record_ptr(id);
         if (record) {
             if (record->t >= t_start && record->t <= t_end) {
                 results.push_back(id);
