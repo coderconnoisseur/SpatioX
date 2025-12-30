@@ -201,6 +201,9 @@ benchmarks/results/
 # Don't ignore these
 !.gitkeep
 !.github/
+
+# Project-specific files to ignore
 example.py
 test_basic.py
 documentation.txt
+BUILD.md
