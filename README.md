@@ -200,7 +200,7 @@ spatio-temporal-index/
 
 ## License
 
-MIT License (or your chosen license)
+MIT License
 
 ## Contributing
 
